@@ -9,38 +9,6 @@ import (
 
 var IngressRuleInvalid = "[ingress rule invalid]"
 
-// /path default
-// /v1! Exact pathType
-// /v1* Prefix pathType
-func parsePath(paths string) (pathRules []PathRule) {
-	segments := strings.Split(paths, ",")
-
-	for _, p := range segments {
-		if p == "" {
-			continue
-		}
-
-		if strings.HasSuffix(p, "!") {
-			pathRules = append(pathRules, PathRule{
-				Path:     p[0 : len(p)-1],
-				PathType: networkingv1.PathTypeExact,
-			})
-		} else if strings.HasSuffix(p, "*") {
-			pathRules = append(pathRules, PathRule{
-				Path:     p[0 : len(p)-1],
-				PathType: networkingv1.PathTypePrefix,
-			})
-		} else {
-			pathRules = append(pathRules, PathRule{
-				Path:     p,
-				PathType: networkingv1.PathTypeImplementationSpecific,
-			})
-		}
-	}
-
-	return
-}
-
 // https://www.baidu.com,/path,/v1!,/v2*
 func ParseIngress(ingress string) (*Ingress, error) {
 	if ingress == "" {
@@ -112,4 +80,36 @@ type Ingress struct {
 type PathRule struct {
 	Path     string
 	PathType networkingv1.PathType
+}
+
+// /path default
+// /v1! Exact pathType
+// /v1* Prefix pathType
+func parsePath(paths string) (pathRules []PathRule) {
+	segments := strings.Split(paths, ",")
+
+	for _, p := range segments {
+		if p == "" {
+			continue
+		}
+
+		if strings.HasSuffix(p, "!") {
+			pathRules = append(pathRules, PathRule{
+				Path:     p[0 : len(p)-1],
+				PathType: networkingv1.PathTypeExact,
+			})
+		} else if strings.HasSuffix(p, "*") {
+			pathRules = append(pathRules, PathRule{
+				Path:     p[0 : len(p)-1],
+				PathType: networkingv1.PathTypePrefix,
+			})
+		} else {
+			pathRules = append(pathRules, PathRule{
+				Path:     p,
+				PathType: networkingv1.PathTypeImplementationSpecific,
+			})
+		}
+	}
+
+	return
 }

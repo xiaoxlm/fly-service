@@ -19,68 +19,76 @@ func TestParseIngress(t *testing.T) {
 	}{
 		{
 			name: "#default",
-			args: args{ingress: "https://www.baidu.com:8080,/aaaa"},
+			args: args{ingress: "https://www.baidu.com:8080,/aaa"},
 			want: &Ingress{
 				Scheme: "https",
 				Host:   "www.baidu.com",
 				Port:   8080,
 				Paths: []PathRule{
 					{
-						Path:     "/aaaa",
+						Path:     "/aaa",
 						PathType: networkingv1.PathTypeImplementationSpecific,
 					},
 				},
 			},
 			wantErr: false,
 		},
-		//{
-		//	name: "#excact path type",
-		//	args: args{ingress: ""},
-		//	want: &Ingress{
-		//		Scheme: "",
-		//		Host:   "",
-		//		Port:   0,
-		//		Paths: []PathRule{
-		//			{
-		//				Path:     "",
-		//				PathType: "",
-		//			},
-		//		},
-		//	},
-		//	wantErr: false,
-		//},
-		//{
-		//	name: "#prefix path type",
-		//	args: args{ingress: ""},
-		//	want: &Ingress{
-		//		Scheme: "",
-		//		Host:   "",
-		//		Port:   0,
-		//		Paths: []PathRule{
-		//			{
-		//				Path:     "",
-		//				PathType: "",
-		//			},
-		//		},
-		//	},
-		//	wantErr: false,
-		//},
-		//{
-		//	name: "#mix",
-		//	args: args{ingress: ""},
-		//	want: &Ingress{
-		//		Scheme: "",
-		//		Host:   "",
-		//		Port:   0,
-		//		Paths: []PathRule{
-		//			{
-		//				Path:     "",
-		//				PathType: "",
-		//			},
-		//		},
-		//	},
-		//	wantErr: false,
-		//},
+		{
+			name: "#excact path type",
+			args: args{ingress: "https://www.baidu.com:8080,/aaa!"},
+			want: &Ingress{
+				Scheme: "https",
+				Host:   "www.baidu.com",
+				Port:   8080,
+				Paths: []PathRule{
+					{
+						Path:     "/aaa",
+						PathType: networkingv1.PathTypeExact,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "#prefix path type",
+			args: args{ingress: "https://www.baidu.com:8080,/aaa*"},
+			want: &Ingress{
+				Scheme: "https",
+				Host:   "www.baidu.com",
+				Port:   8080,
+				Paths: []PathRule{
+					{
+						Path:     "/aaa",
+						PathType: networkingv1.PathTypePrefix,
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "#mix",
+			args: args{ingress: "https://www.baidu.com:8080,/aaa,/bbb!,/ccc*"},
+			want: &Ingress{
+				Scheme: "https",
+				Host:   "www.baidu.com",
+				Port:   8080,
+				Paths: []PathRule{
+					{
+						Path:     "/aaa",
+						PathType: networkingv1.PathTypeImplementationSpecific,
+					},
+					{
+						Path:     "/bbb",
+						PathType: networkingv1.PathTypeExact,
+					},
+					{
+						Path:     "/ccc",
+						PathType: networkingv1.PathTypePrefix,
+					},
+				},
+			},
+			wantErr: false,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
