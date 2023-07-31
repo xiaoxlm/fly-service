@@ -1,0 +1,12 @@
+apiVersion: apps.serving.kubefly.tech/v1alpha1
+kind: FlyService
+metadata:
+  labels:
+    app.kubernetes.io/name: flyservice
+    app.kubernetes.io/instance: flyservice-sample
+    app.kubernetes.io/part-of: fly-service
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/created-by: fly-service
+  name: flyservice-sample
+spec:
+  # TODO(user): Add fields here
