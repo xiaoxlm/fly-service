@@ -1,6 +1,7 @@
 package strfmt
 
 import (
+	"bytes"
 	"fmt"
 	networkingv1 "k8s.io/api/networking/v1"
 	"strconv"
@@ -70,6 +71,11 @@ func ParseIngress(ingress string) (*Ingress, error) {
 	}, nil
 }
 
+type PathRule struct {
+	Path     string
+	PathType networkingv1.PathType
+}
+
 type Ingress struct {
 	Scheme string
 	Host   string
@@ -77,9 +83,71 @@ type Ingress struct {
 	Paths  []PathRule
 }
 
-type PathRule struct {
-	Path     string
-	PathType networkingv1.PathType
+func (ingress *Ingress) String() (string, error) {
+	// check
+	{
+		if len(ingress.Paths) < 1 {
+			return "", fmt.Errorf(IngressRuleInvalid + "paths can't be empty")
+		}
+	}
+
+	buf := bytes.NewBuffer(nil)
+
+	defaultPort := 80
+
+	// scheme
+	if ingress.Scheme == "" {
+		buf.WriteString("http://")
+	} else {
+		buf.WriteString(ingress.Scheme)
+		buf.WriteString("://")
+	}
+
+	// host
+	buf.WriteString(ingress.Host)
+
+	// port
+	if ingress.Port == 0 {
+		_, err := fmt.Fprintf(buf, ":%d", defaultPort)
+		if err != nil {
+			return "", err
+		}
+	} else {
+		_, err := fmt.Fprintf(buf, ":%d", ingress.Port)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	// paths
+	for _, path := range ingress.Paths {
+
+		buf.WriteString(",")
+		buf.WriteString(path.Path)
+
+		switch path.PathType {
+		case networkingv1.PathTypeExact:
+			buf.WriteString("!")
+		case networkingv1.PathTypePrefix:
+			buf.WriteString("*")
+		}
+	}
+
+	return buf.String(), nil
+}
+
+func (ingress *Ingress) MarshalText() ([]byte, error) {
+	ingressSTR, err := ingress.String()
+	return []byte(ingressSTR), err
+}
+
+func (ingress *Ingress) UnmarshalText(data []byte) error {
+	ir, err := ParseIngress(string(data))
+	if err != nil {
+		return err
+	}
+	*ingress = *ir
+	return nil
 }
 
 // /path default

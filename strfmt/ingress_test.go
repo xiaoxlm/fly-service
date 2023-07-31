@@ -103,3 +103,57 @@ func TestParseIngress(t *testing.T) {
 		})
 	}
 }
+
+func TestIngress_String(t *testing.T) {
+	type fields struct {
+		Scheme string
+		Host   string
+		Port   uint16
+		Paths  []PathRule
+	}
+	tests := []struct {
+		name   string
+		fields fields
+		want   string
+	}{
+		{
+			name: "#mix",
+			fields: fields{
+				Scheme: "https",
+				Host:   "www.baidu.com",
+				Port:   8080,
+				Paths: []PathRule{
+					{
+						Path: "/aaa",
+					},
+					{
+						Path:     "/bbb",
+						PathType: networkingv1.PathTypeExact,
+					},
+					{
+						Path:     "/ccc",
+						PathType: networkingv1.PathTypePrefix,
+					},
+				},
+			},
+			want: "https://www.baidu.com:8080,/aaa,/bbb!,/ccc*",
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			ingress := &Ingress{
+				Scheme: tt.fields.Scheme,
+				Host:   tt.fields.Host,
+				Port:   tt.fields.Port,
+				Paths:  tt.fields.Paths,
+			}
+			got, err := ingress.String()
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got != tt.want {
+				t.Errorf("String() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
