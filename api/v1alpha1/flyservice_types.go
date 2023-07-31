@@ -20,6 +20,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
+func init() {
+	SchemeBuilder.Register(&FlyService{}, &FlyServiceList{})
+}
+
 // EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
 // NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
 
@@ -59,6 +63,10 @@ type FlyServiceList struct {
 	Items           []FlyService `json:"items"`
 }
 
-func init() {
-	SchemeBuilder.Register(&FlyService{}, &FlyServiceList{})
+type ProbeOpts struct {
+	InitialDelaySeconds int32 `json:"initialDelaySeconds,omitempty" `
+	TimeoutSeconds      int32 `json:"timeoutSeconds,omitempty" `
+	PeriodSeconds       int32 `json:"periodSeconds,omitempty" `
+	SuccessThreshold    int32 `json:"successThreshold,omitempty" `
+	FailureThreshold    int32 `json:"failureThreshold,omitempty" `
 }
