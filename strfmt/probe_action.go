@@ -2,12 +2,15 @@
 package strfmt
 
 import (
+	"fmt"
 	corev1 "k8s.io/api/core/v1"
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"net/url"
 	"strconv"
 	"strings"
 )
+
+var ProbeActionInvalid = "[probe action invalid]"
 
 // http://:80
 // tcp://:80
@@ -22,7 +25,7 @@ func ParseAction(str string) (*Action, error) {
 	if strings.HasPrefix(str, "http") || strings.HasPrefix(str, "tcp") {
 		u, err := url.Parse(str)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf(ProbeActionInvalid + err.Error())
 		}
 
 		port, _ := strconv.ParseUint(u.Port(), 10, 64)

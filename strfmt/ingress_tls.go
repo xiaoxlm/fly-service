@@ -11,17 +11,17 @@ func ParseIngressTLS(s string) (*IngressTLS, error) {
 		return nil, fmt.Errorf("invalid ingress tls")
 	}
 
-	tlsStr := strings.Split(s, ":")
+	segments := strings.Split(s, ":")
 
 	var (
 		secretName string
 		hosts      []string
 	)
 	{
-		secretName = tlsStr[0]
+		secretName = segments[0]
 
-		if len(tlsStr) > 1 {
-			hosts = strings.Split(tlsStr[1], ",")
+		if len(segments) > 1 {
+			hosts = strings.Split(segments[1], ",")
 		}
 	}
 
