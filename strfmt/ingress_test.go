@@ -147,10 +147,7 @@ func TestIngress_String(t *testing.T) {
 				Port:   tt.fields.Port,
 				Paths:  tt.fields.Paths,
 			}
-			got, err := ingress.String()
-			if err != nil {
-				t.Fatal(err)
-			}
+			got := ingress.String()
 			if got != tt.want {
 				t.Errorf("String() = %v, want %v", got, tt.want)
 			}

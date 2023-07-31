@@ -83,13 +83,7 @@ type Ingress struct {
 	Paths  []PathRule
 }
 
-func (ingress *Ingress) String() (string, error) {
-	// check
-	{
-		if len(ingress.Paths) < 1 {
-			return "", fmt.Errorf(IngressRuleInvalid + "paths can't be empty")
-		}
-	}
+func (ingress *Ingress) String() string {
 
 	buf := bytes.NewBuffer(nil)
 
@@ -108,15 +102,9 @@ func (ingress *Ingress) String() (string, error) {
 
 	// port
 	if ingress.Port == 0 {
-		_, err := fmt.Fprintf(buf, ":%d", defaultPort)
-		if err != nil {
-			return "", err
-		}
+		_, _ = fmt.Fprintf(buf, ":%d", defaultPort)
 	} else {
-		_, err := fmt.Fprintf(buf, ":%d", ingress.Port)
-		if err != nil {
-			return "", err
-		}
+		_, _ = fmt.Fprintf(buf, ":%d", ingress.Port)
 	}
 
 	// paths
@@ -133,12 +121,12 @@ func (ingress *Ingress) String() (string, error) {
 		}
 	}
 
-	return buf.String(), nil
+	return buf.String()
 }
 
 func (ingress *Ingress) MarshalText() ([]byte, error) {
-	ingressSTR, err := ingress.String()
-	return []byte(ingressSTR), err
+	ingressSTR := ingress.String()
+	return []byte(ingressSTR), nil
 }
 
 func (ingress *Ingress) UnmarshalText(data []byte) error {
