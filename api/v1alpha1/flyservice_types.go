@@ -32,8 +32,8 @@ type FlyServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	// Foo is an example field of FlyService. Edit flyservice_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	Replicas *int32 `json:"replicas,omitempty"`
+	Pod      `json:",inline"`
 }
 
 // FlyServiceStatus defines the observed state of FlyService

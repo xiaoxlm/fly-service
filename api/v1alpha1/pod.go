@@ -6,7 +6,8 @@ import (
 )
 
 type Pod struct {
-	Container `json:",inline"`
+	InitContainers []Container `json:"initContainers,omitempty"`
+	Containers     []Container `json:"containers"`
 
 	RestartPolicy                 string                            `json:"restartPolicy,omitempty"`
 	TerminationGracePeriodSeconds *int64                            `json:"terminationGracePeriodSeconds,omitempty"`
@@ -53,6 +54,8 @@ type ProbeOpts struct {
 	SuccessThreshold    int32 `json:"successThreshold,omitempty"`
 	FailureThreshold    int32 `json:"failureThreshold,omitempty"`
 }
+
+type Volumes map[string]corev1.VolumeSource
 
 type Resources map[string]strfmt.RequestLimit
 
