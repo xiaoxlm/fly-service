@@ -18,6 +18,7 @@ package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"serving.kubefly.tech/fly-service/strfmt"
 )
 
 func init() {
@@ -32,8 +33,12 @@ type FlyServiceSpec struct {
 	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
 	// Important: Run "make" to regenerate code after modifying this file
 
-	Replicas *int32 `json:"replicas,omitempty"`
+	Replicas *int32            `json:"replicas,omitempty"`
+	Strategy *strfmt.Strategy  `json:"strategy,omitempty"`
+	Label    map[string]string `json:"label,omitempty"`
+	Service  *Service          `json:"service"`
 	Pod      `json:",inline"`
+	Ingress  `json:",inline"`
 }
 
 // FlyServiceStatus defines the observed state of FlyService

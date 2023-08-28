@@ -9,65 +9,29 @@ type Pod struct {
 	InitContainers []Container `json:"initContainers,omitempty"`
 	Containers     []Container `json:"containers"`
 
-	RestartPolicy                 string                            `json:"restartPolicy,omitempty"`
-	TerminationGracePeriodSeconds *int64                            `json:"terminationGracePeriodSeconds,omitempty"`
-	ActiveDeadlineSeconds         *int64                            `json:"activeDeadlineSeconds,omitempty"`
-	DNSConfig                     *corev1.PodDNSConfig              `json:"dnsConfig,omitempty"`
-	DNSPolicy                     string                            `json:"dnsPolicy,omitempty"`
-	NodeSelector                  map[string]string                 `json:"nodeSelector,omitempty"`
-	Hosts                         []strfmt.HostAlias                `json:"hosts,omitempty"`
-	ServiceAccountName            string                            `json:"serviceAccountName,omitempty"`
-	TopologySpreadConstraints     []corev1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" `
-	Affinity                      *corev1.Affinity                  `json:"affinity,omitempty"`
+	RestartPolicy                 string                             `json:"restartPolicy,omitempty"`
+	TerminationGracePeriodSeconds *int64                             `json:"terminationGracePeriodSeconds,omitempty"`
+	ActiveDeadlineSeconds         *int64                             `json:"activeDeadlineSeconds,omitempty"`
+	DNSConfig                     *DNSConfig                         `json:"dnsConfig,omitempty"`
+	DNSPolicy                     string                             `json:"dnsPolicy,omitempty"`
+	NodeSelector                  map[string]string                  `json:"nodeSelector,omitempty"`
+	Hosts                         []*strfmt.HostAlias                `json:"hosts,omitempty"`
+	ServiceAccountName            string                             `json:"serviceAccountName,omitempty"`
+	Volumes                       Volumes                            `json:"volumes,omitempty"`
+	TopologySpreadConstraints     []*corev1.TopologySpreadConstraint `json:"topologySpreadConstraints,omitempty" `
+	Affinity                      *corev1.Affinity                   `json:"affinity,omitempty"`
+	Tolerations                   []*corev1.Toleration               `json:"tolerations,omitempty"`
 }
 
-type Container struct {
-	Image           string                  `json:"image,omitempty"`
-	ImagePullSecret string                  `json:"imagePullSecret,omitempty"`
-	ImagePullPolicy string                  `json:"imagePullPolicy,omitempty"`
-	WorkingDir      string                  `json:"workingDir,omitempty"`
-	Command         []string                `json:"command,omitempty"`
-	Args            []string                `json:"args,omitempty"`
-	Mounts          []strfmt.VolumeMount    `json:"mounts,omitempty"`
-	Envs            Envs                    `json:"envs,omitempty"`
-	TTY             bool                    `json:"tty,omitempty"`
-	ReadinessProbe  *Probe                  `json:"readinessProbe,omitempty"`
-	LivenessProbe   *Probe                  `json:"livenessProbe,omitempty"`
-	Lifecycle       *Lifecycle              `json:"lifecycle,omitempty"`
-	SecurityContext *corev1.SecurityContext `json:"securityContext,omitempty"`
+type Volumes map[string]*corev1.VolumeSource
+
+type DNSConfig struct {
+	Nameservers []string      `json:"nameservers,omitempty" yaml:"nameservers,omitempty"`
+	Searches    []string      `json:"searches,omitempty" yaml:"searches,omitempty"`
+	Options     []*KubeOption `json:"options,omitempty" yaml:"options,omitempty"`
 }
 
-type Lifecycle struct {
-	PostStart *strfmt.Action `json:"postStart,omitempty"`
-	PreStop   *strfmt.Action `json:"preStop,omitempty"`
-}
-
-type Probe struct {
-	Action    strfmt.Action `json:"action"`
-	ProbeOpts `json:",inline"`
-}
-
-type ProbeOpts struct {
-	InitialDelaySeconds int32 `json:"initialDelaySeconds,omitempty"`
-	TimeoutSeconds      int32 `json:"timeoutSeconds,omitempty"`
-	PeriodSeconds       int32 `json:"periodSeconds,omitempty"`
-	SuccessThreshold    int32 `json:"successThreshold,omitempty"`
-	FailureThreshold    int32 `json:"failureThreshold,omitempty"`
-}
-
-type Volumes map[string]corev1.VolumeSource
-
-type Resources map[string]strfmt.RequestLimit
-
-type Envs map[string]string
-
-func (envs Envs) Merge(srcEnvs Envs) Envs {
-	es := Envs{}
-	for k, v := range envs {
-		es[k] = v
-	}
-	for k, v := range srcEnvs {
-		es[k] = v
-	}
-	return es
+type KubeOption struct {
+	Name  string `yaml:"name" json:"name" toml:"name"`
+	Value string `yaml:"value,omitempty" json:"value,omitempty" toml:"value,omitempty"`
 }
